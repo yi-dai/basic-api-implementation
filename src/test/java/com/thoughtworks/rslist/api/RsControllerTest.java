@@ -1,6 +1,8 @@
 package com.thoughtworks.rslist.api;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.domain.RsEvent;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -77,11 +79,13 @@ public class RsControllerTest {
     @Test
     @Order(5)
     void shouldChangeOneRsEvent() throws Exception {
-        String rsEventJson = "{\"eventName\":\"第四条事件\",\"keyWord\":\"未分类\"}";
+        RsEvent rsEvent = new RsEvent(null, "未分类");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String rsEventJson = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/1").content(rsEventJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$[0].eventName",is("第四条事件")))
+                .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("未分类")))
                 .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord",is("二类")))
@@ -95,10 +99,8 @@ public class RsControllerTest {
     @Test
     @Order(6)
     void shouldDeleteOneRsEvent() throws Exception {
-
         mockMvc.perform(delete("/rs/1"))
                 .andExpect(status().isOk());
-
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$[0].eventName",is("第二条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("二类")))

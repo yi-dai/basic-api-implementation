@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 
 @RestController
 public class RsController {
-  //private List<String> rsList = Stream.of("第一条事件", "第二条事件", "第三条事件").collect(Collectors.toList());
   private List<RsEvent> rsList = initalList();
   private List<RsEvent> initalList(){
     List<RsEvent> list = new ArrayList<>();
@@ -52,11 +51,25 @@ public class RsController {
     ObjectMapper objectMapper = new ObjectMapper();
     RsEvent rsEvent = objectMapper.readValue(rsEventString,RsEvent.class);
     RsEvent rsEventOld = rsList.get(index - 1);
-    if (!rsEventOld.getEventName().equals(rsEvent.getEventName())){
-      rsEventOld.setEventName(rsEvent.getEventName().toString());
-    }
-    if (!rsEventOld.getKeyWord().equals(rsEvent.getKeyWord())){
-      rsEventOld.setKeyWord(rsEvent.getKeyWord().toString());
+    String keyWord = rsEvent.getKeyWord();
+    String eventName = rsEvent.getEventName();
+    if (keyWord == null){
+      if (!rsEventOld.getEventName().equals(rsEvent.getEventName())){
+        rsEventOld.setEventName(rsEvent.getEventName().toString());
+      }
+      return;
+    } else if (eventName == null){
+      if (!rsEventOld.getKeyWord().equals(rsEvent.getKeyWord())){
+        rsEventOld.setKeyWord(rsEvent.getKeyWord().toString());
+      }
+      return;
+    } else {
+      if (!rsEventOld.getEventName().equals(rsEvent.getEventName())){
+        rsEventOld.setEventName(rsEvent.getEventName().toString());
+      }
+      if (!rsEventOld.getKeyWord().equals(rsEvent.getKeyWord())){
+        rsEventOld.setKeyWord(rsEvent.getKeyWord().toString());
+      }
     }
   }
 
