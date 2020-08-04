@@ -21,7 +21,6 @@ public class RsEvent {
     }
 
     public RsEvent(){
-
     }
 
     public RsEvent(String eventName, String keyWord){
