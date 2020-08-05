@@ -149,4 +149,23 @@ public class RsControllerTest {
                 .andExpect(status().isOk());
         assertEquals(2, UserController.users.size());
     }
+
+    @Test
+    @Order(9)
+    void shouldAddOneRsEventWithSameNameUser() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("A", "male",19,"a@c.v", "11234567890");
+        String userString = objectMapper.writeValueAsString(user);
+        RsEvent rsEvent = new RsEvent("第七条事件", "未分类",userString);
+        String rsEventJson = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(rsEventJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(jsonPath("$[4].eventName",is("第六条事件")))
+                .andExpect(jsonPath("$[4].keyWord",is("未分类")))
+                .andExpect(status().isOk());
+        assertEquals(3, UserController.users.size());
+    }
+
+
 }
