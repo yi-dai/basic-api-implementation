@@ -9,9 +9,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.hamcrest.Matchers.is;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -31,7 +34,7 @@ public class UserControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String userJSON = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         assertEquals(1, UserController.users.size());
     }
 
@@ -123,5 +126,21 @@ public class UserControllerTest {
         String userJSON = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAllUsers() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user1 = new User("Alibaba", "female", 18, "a@b.c", "11234567890");
+        String userJSON1 = objectMapper.writeValueAsString(user1);
+        mockMvc.perform(post("/user").content(userJSON1).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        User user2 = new User("Tom", "female", 18, "a@b.c", "11234567890");
+        String userJSON2 = objectMapper.writeValueAsString(user2);
+        mockMvc.perform(post("/user").content(userJSON2).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        mockMvc.perform(get("/user/list"))
+                .andExpect(jsonPath("$[0].name", is("Alibaba")))
+                .andExpect(status().isOk());
     }
 }

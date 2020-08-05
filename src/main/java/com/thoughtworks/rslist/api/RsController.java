@@ -45,7 +45,7 @@ public class RsController {
   public ResponseEntity addOneRsEvent(@RequestBody @Valid RsEvent rsEvent1) throws JsonProcessingException {
     User user = rsEvent1.getUser();
     rsList.add(rsEvent1);
-    UserController.userRegister(user);
+    UserController.addUser(user);
     Integer index = rsList.size() - 1;
     String headValue = index.toString();
     return ResponseEntity.created(null).header("index", headValue).build();
