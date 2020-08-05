@@ -201,4 +201,20 @@ public class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @Order(13)
+    void outOfIndexStartPosition() throws Exception {
+        mockMvc.perform(get("/rs/list?start=-1&end=2"))
+                .andExpect(jsonPath("$.errorMessage", is("invalid request param")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(14)
+    void outOfIndexEndPosition() throws Exception {
+        mockMvc.perform(get("/rs/list?start=1&end=10"))
+                .andExpect(jsonPath("$.errorMessage", is("invalid request param")))
+                .andExpect(status().isBadRequest());
+    }
+
 }
