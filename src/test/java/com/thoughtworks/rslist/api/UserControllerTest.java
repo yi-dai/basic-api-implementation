@@ -34,4 +34,94 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
         assertEquals(1, UserController.users.size());
     }
+
+    @Test
+    void nameShouldNotNull() throws Exception {
+        User user = new User(null, "female", 18, "a@b.c", "11234567890");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void nameShouldNotEmpty() throws Exception {
+        User user = new User("", "female", 18, "a@b.c", "11234567890");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void nameShouldNotLongerThan8() throws Exception {
+        User user = new User("Alibababa", "female", 18, "a@b.c", "11234567890");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void genderShouldNotNull() throws Exception {
+        User user = new User("Alibaba", null, 18, "a@b.c", "11234567890");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void genderShouldNotEmpty() throws Exception {
+        User user = new User("Alibaba", "", 18, "a@b.c", "11234567890");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void ageShouldNotLess18() throws Exception {
+        User user = new User("Alibaba", "male", 17, "a@b.c", "11234567890");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void ageShouldNotLarge100() throws Exception {
+        User user = new User("Alibaba", "male", 101, "a@b.c", "11234567890");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void emailShouldValid() throws Exception {
+        User user = new User("Alibaba", "male", 21, "ab.c", "11234567890");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void phoneShouldStartWith1() throws Exception {
+        User user = new User("Alibaba", "male", 21, "a@b.c", "21234567890");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void phoneShouldBe11Digital() throws Exception {
+        User user = new User("Alibaba", "male", 21, "a@b.c", "1123456789");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJSON = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(userJSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }

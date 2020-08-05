@@ -8,11 +8,18 @@ import javax.validation.constraints.*;
 @Data
 public class User {
 
-
+    @Size(min = 1, max = 8)
+    @NotNull
     private String name;
+    @Size(min = 1)
+    @NotNull
     private String gender;
+    @Max(100)
+    @Min(18)
     private int age;
+    @Email
     private String email;
+    @Pattern(regexp = "1\\d{10}")
     private String phone;
     private int vote = 10;
 
