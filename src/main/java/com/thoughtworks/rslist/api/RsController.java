@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
@@ -16,14 +17,16 @@ public class RsController {
   private List<RsEvent> rsList = initalList();
   private List<RsEvent> initalList(){
     List<RsEvent> list = new ArrayList<>();
-    list.add(new RsEvent("第一条事件","一类",null));
-    list.add(new RsEvent("第二条事件","二类", null));
-    list.add(new RsEvent("第三条事件","未分类", null));
+    User user = new User("Alibaba", "female",19,"a@c.v", "11234567890");
+    list.add(new RsEvent("第一条事件","一类",user));
+    list.add(new RsEvent("第二条事件","二类", user));
+    list.add(new RsEvent("第三条事件","未分类", user));
     return list;
 
   }
 
   @GetMapping("/rs/list")
+  @JsonView(RsEvent.publicView.class)
   public ResponseEntity<List<RsEvent>> getRsList(@RequestParam(required = false) Integer start,
                                                 @RequestParam(required = false) Integer end){
     if (start == null || end == null){
@@ -33,6 +36,7 @@ public class RsController {
   }
 
   @GetMapping("/rs/{index}")
+  @JsonView(RsEvent.publicView.class)
   public ResponseEntity<RsEvent> getOneRsEvent(@PathVariable int index){
     return ResponseEntity.ok(rsList.get(index - 1));
   }
@@ -41,12 +45,8 @@ public class RsController {
   public ResponseEntity addOneRsEvent(@RequestBody @Valid RsEvent rsEvent1) throws JsonProcessingException {
     User user = rsEvent1.getUser();
     rsList.add(rsEvent1);
+    UserController.userRegister(user);
     Integer index = rsList.size() - 1;
-    if(user != null){
-      if(!UserController.users.contains(user)){
-        UserController.users.add(user);
-      }
-    }
     String headValue = index.toString();
     return ResponseEntity.created(null).header("index", headValue).build();
   }

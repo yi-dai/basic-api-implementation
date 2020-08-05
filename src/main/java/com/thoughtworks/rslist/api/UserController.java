@@ -15,7 +15,10 @@ public class UserController {
     public static List<User> users = new ArrayList<>();
 
     @PostMapping("/user")
-    public void userRegister(@RequestBody @Valid User user){
+    public static void userRegister(@RequestBody @Valid User user){
+        if(users.contains(user)){
+           return;
+        }
         users.add(user);
     }
 
