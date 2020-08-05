@@ -41,12 +41,14 @@ public class RsController {
   public ResponseEntity addOneRsEvent(@RequestBody @Valid RsEvent rsEvent1) throws JsonProcessingException {
     User user = rsEvent1.getUser();
     rsList.add(rsEvent1);
+    Integer index = rsList.size() - 1;
     if(user != null){
       if(!UserController.users.contains(user)){
         UserController.users.add(user);
       }
     }
-    return ResponseEntity.created(null).build();
+    String headValue = index.toString();
+    return ResponseEntity.created(null).header("index", headValue).build();
   }
 
   @PostMapping("/rs/{index}")
@@ -56,16 +58,18 @@ public class RsController {
     RsEvent rsEventNeedBeUpdated = rsList.get(index - 1);
     String keyWord = rsEvent.getKeyWord();
     String eventName = rsEvent.getEventName();
+    Integer indexInteger = index;
+    String headValue = indexInteger.toString();
     if (keyWord == null){
       if (!rsEventNeedBeUpdated.getEventName().equals(rsEvent.getEventName())){
         rsEventNeedBeUpdated.setEventName(rsEvent.getEventName().toString());
       }
-      return ResponseEntity.created(null).build();
+      return ResponseEntity.created(null).header("index", headValue).build();
     } else if (eventName == null){
       if (!rsEventNeedBeUpdated.getKeyWord().equals(rsEvent.getKeyWord())){
         rsEventNeedBeUpdated.setKeyWord(rsEvent.getKeyWord().toString());
       }
-      return ResponseEntity.created(null).build();
+      return ResponseEntity.created(null).header("index", headValue).build();
     } else {
       if (!rsEventNeedBeUpdated.getEventName().equals(rsEvent.getEventName())){
         rsEventNeedBeUpdated.setEventName(rsEvent.getEventName().toString());
@@ -74,7 +78,7 @@ public class RsController {
         rsEventNeedBeUpdated.setKeyWord(rsEvent.getKeyWord().toString());
       }
     }
-    return ResponseEntity.created(null).build();
+    return ResponseEntity.created(null).header("index", headValue).build();
   }
 
   @DeleteMapping("/rs/{index}")
