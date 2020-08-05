@@ -78,7 +78,7 @@ public class RsControllerTest {
 
     @Test
     @Order(5)
-    void shouldChangeOneRsEvent() throws Exception {
+    void shouldUpdateOneRsEvent() throws Exception {
         RsEvent rsEvent = new RsEvent(null, "未分类");
         ObjectMapper objectMapper = new ObjectMapper();
         String rsEventJson = objectMapper.writeValueAsString(rsEvent);

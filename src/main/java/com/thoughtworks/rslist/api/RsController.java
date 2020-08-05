@@ -47,30 +47,62 @@ public class RsController {
   }
 
   @PostMapping("/rs/{index}")
-  public void changeOneRsEvent(@PathVariable int index, @RequestBody String rsEventString) throws JsonProcessingException {
+  public void updateOneRsEvent(@PathVariable int index, @RequestBody String rsEventString) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     RsEvent rsEvent = objectMapper.readValue(rsEventString,RsEvent.class);
-    RsEvent rsEventOld = rsList.get(index - 1);
+    RsEvent rsEventNeedBeUpdated = rsList.get(index - 1);
+
     String keyWord = rsEvent.getKeyWord();
     String eventName = rsEvent.getEventName();
-    if (keyWord == null){
-      if (!rsEventOld.getEventName().equals(rsEvent.getEventName())){
-        rsEventOld.setEventName(rsEvent.getEventName().toString());
+    /*
+    if(keyWord == null || eventName == null){
+      return;
+    } else if(keyWord == null){
+      if (!rsEventNeedBeUpdated.getEventName().equals(rsEvent.getEventName())){
+        rsEventNeedBeUpdated.setEventName(rsEvent.getEventName().toString());
       }
       return;
-    } else if (eventName == null){
-      if (!rsEventOld.getKeyWord().equals(rsEvent.getKeyWord())){
-        rsEventOld.setKeyWord(rsEvent.getKeyWord().toString());
+    } else if(eventName == null){
+      if (!rsEventNeedBeUpdated.getKeyWord().equals(rsEvent.getKeyWord())){
+        rsEventNeedBeUpdated.setKeyWord(rsEvent.getKeyWord().toString());
       }
       return;
     } else {
-      if (!rsEventOld.getEventName().equals(rsEvent.getEventName())){
-        rsEventOld.setEventName(rsEvent.getEventName().toString());
+      if (!rsEventNeedBeUpdated.getKeyWord().equals(rsEvent.getKeyWord())){
+        rsEventNeedBeUpdated.setKeyWord(rsEvent.getKeyWord().toString());
       }
-      if (!rsEventOld.getKeyWord().equals(rsEvent.getKeyWord())){
-        rsEventOld.setKeyWord(rsEvent.getKeyWord().toString());
+      if (!rsEventNeedBeUpdated.getEventName().equals(rsEvent.getEventName())){
+        rsEventNeedBeUpdated.setEventName(rsEvent.getEventName().toString());
       }
     }
+
+     */
+
+
+
+    if (keyWord == null){
+      if (!rsEventNeedBeUpdated.getEventName().equals(rsEvent.getEventName())){
+        rsEventNeedBeUpdated.setEventName(rsEvent.getEventName().toString());
+      }
+      return;
+    } else if (eventName == null){
+      if (!rsEventNeedBeUpdated.getKeyWord().equals(rsEvent.getKeyWord())){
+        rsEventNeedBeUpdated.setKeyWord(rsEvent.getKeyWord().toString());
+      }
+      return;
+    } else {
+      if (!rsEventNeedBeUpdated.getEventName().equals(rsEvent.getEventName())){
+        rsEventNeedBeUpdated.setEventName(rsEvent.getEventName().toString());
+      }
+      if (!rsEventNeedBeUpdated.getKeyWord().equals(rsEvent.getKeyWord())){
+        rsEventNeedBeUpdated.setKeyWord(rsEvent.getKeyWord().toString());
+      }
+    }
+
+
+
+
+
   }
 
   @DeleteMapping("/rs/{index}")
