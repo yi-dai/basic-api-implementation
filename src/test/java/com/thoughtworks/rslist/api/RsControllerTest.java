@@ -217,4 +217,12 @@ public class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @Order(15)
+    void outOfIndexRsEvent() throws Exception {
+        mockMvc.perform(get("/rs/10"))
+                .andExpect(jsonPath("$.errorMessage", is("invalid index")))
+                .andExpect(status().isBadRequest());
+    }
+
 }
