@@ -178,5 +178,27 @@ public class RsControllerTest {
         assertEquals(3, UserController.users.size());
     }
 
+    @Test
+    @Order(11)
+    void invalidRsEvent() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("Tom", "male",19,"a@c.v", "11234567890");
+        RsEvent rsEvent = new RsEvent(null, "未分类", user);
+        String rsEventJson = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(rsEventJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorMessage", is("invalid param")))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @Order(12)
+    void invalidUser() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User(null, "male",19,"a@c.v", "11234567890");
+        RsEvent rsEvent = new RsEvent("第八次事件", "未分类", user);
+        String rsEventJson = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(rsEventJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorMessage", is("invalid param")))
+                .andExpect(status().isBadRequest());
+    }
 
 }
