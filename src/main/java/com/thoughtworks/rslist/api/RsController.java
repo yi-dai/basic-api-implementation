@@ -3,6 +3,7 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -13,9 +14,9 @@ public class RsController {
   private List<RsEvent> rsList = initalList();
   private List<RsEvent> initalList(){
     List<RsEvent> list = new ArrayList<>();
-    list.add(new RsEvent("第一条事件","一类"));
-    list.add(new RsEvent("第二条事件","二类"));
-    list.add(new RsEvent("第三条事件","未分类"));
+    list.add(new RsEvent("第一条事件","一类",null));
+    list.add(new RsEvent("第二条事件","二类", null));
+    list.add(new RsEvent("第三条事件","未分类", null));
     return list;
 
   }
@@ -38,7 +39,15 @@ public class RsController {
   public void addOneRsEvent(@RequestBody String rsEvent1) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     RsEvent rsEvent = objectMapper.readValue(rsEvent1,RsEvent.class);
+    String userString = rsEvent.getUser();
     rsList.add(rsEvent);
+    if(userString != null){
+      User user = objectMapper.readValue(userString,User.class);
+      if(!UserController.users.contains(user)){
+        UserController.users.add(user);
+      }
+    }
+
   }
 
   @PostMapping("/rs/{index}")
