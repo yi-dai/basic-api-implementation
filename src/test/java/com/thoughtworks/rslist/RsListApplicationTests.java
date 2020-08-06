@@ -1,8 +1,12 @@
 package com.thoughtworks.rslist;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.RsEventDB;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.entity.RsEventEntity;
 import com.thoughtworks.rslist.entity.UserEntity;
+import com.thoughtworks.rslist.resposiry.RsEventRepository;
 import com.thoughtworks.rslist.resposiry.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +32,8 @@ class RsListApplicationTests {
     MockMvc mockMvc;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RsEventRepository rsEventRepository;
 
     @BeforeEach
     void setup(){
@@ -48,16 +54,15 @@ class RsListApplicationTests {
 
     @Test
     void shouldGetUserWhenGivenId() throws Exception {
-        User user = new User("Tom","male",19,"a@b.c","12345678910");
         UserEntity userEntity = UserEntity.builder()
-                .name(user.getName())
-                .gender(user.getGender())
-                .age(user.getAge())
-                .email(user.getEmail())
-                .phone(user.getPhone())
+                .name("Tom")
+                .gender("male")
+                .age(19)
+                .email("a@b.c")
+                .phone("12345678910")
                 .build();
-        UserEntity newUserEntity = userRepository.save(userEntity);
-        Integer id = newUserEntity.getId();
+        userEntity = userRepository.save(userEntity);
+        Integer id = userEntity.getID();
         mockMvc.perform(get("/db/user/"+id))
                 .andExpect(jsonPath("$.name", is("Tom")))
                 .andExpect(status().isOk());
@@ -65,21 +70,39 @@ class RsListApplicationTests {
 
     @Test
     void shouldDeleteUserWhenGivenId() throws Exception {
-
-        User user = new User("Tom","male",19,"a@b.c","12345678910");
         UserEntity userEntity = UserEntity.builder()
-                .name(user.getName())
-                .gender(user.getGender())
-                .age(user.getAge())
-                .email(user.getEmail())
-                .phone(user.getPhone())
+                .name("Tom")
+                .gender("male")
+                .age(19)
+                .email("a@b.c")
+                .phone("12345678910")
                 .build();
-        UserEntity newUserEntity = userRepository.save(userEntity);
-        Integer id = newUserEntity.getId();
+        userEntity = userRepository.save(userEntity);
+        Integer id = userEntity.getID();
         mockMvc.perform(delete("/db/user/"+id))
                 .andExpect(status().isOk());
         List<UserEntity> userListNew = userRepository.findAll();
         assertEquals(0,userListNew.size());
+    }
 
+    @Test
+    void shouldAddRsEvent() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("Tom")
+                .gender("male")
+                .age(19)
+                .email("a@b.c")
+                .phone("12345678910")
+                .build();
+        userEntity = userRepository.save(userEntity);
+        String userID = String.valueOf(userEntity.getID());
+        RsEventDB rsEventDB = new RsEventDB("股票", "经济", userID);
+        String ursEventDBString = objectMapper.writeValueAsString(rsEventDB);
+        mockMvc.perform(post("/db/rs/event").content(ursEventDBString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        List<RsEventEntity> rsEventList = rsEventRepository.findAll();
+        assertEquals(1,rsEventList.size());
+        assertEquals("股票", rsEventList.get(0).getEventName());
+        assertEquals("经济", rsEventList.get(0).getKeyWord());
     }
 }

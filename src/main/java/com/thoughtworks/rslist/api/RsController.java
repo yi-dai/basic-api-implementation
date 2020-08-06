@@ -3,9 +3,13 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.RsEventDB;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.entity.RsEventEntity;
 import com.thoughtworks.rslist.exception.CommonError;
 import com.thoughtworks.rslist.exception.InvalidIndexException;
+import com.thoughtworks.rslist.resposiry.RsEventRepository;
+import com.thoughtworks.rslist.resposiry.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +21,15 @@ import java.util.List;
 
 @RestController
 public class RsController {
+
+
+  public RsController(UserRepository userRepository, RsEventRepository rsEventRepository) {
+    this.userRepository = userRepository;
+    this.rsEventRepository = rsEventRepository;
+  }
+  private final UserRepository userRepository;
+  private final RsEventRepository rsEventRepository;
+
   private List<RsEvent> rsList = initalList();
   private List<RsEvent> initalList(){
     List<RsEvent> list = new ArrayList<>();
@@ -58,6 +71,22 @@ public class RsController {
     Integer index = rsList.size() - 1;
     String headValue = index.toString();
     return ResponseEntity.created(null).header("index", headValue).build();
+  }
+
+  @PostMapping("/db/rs/event")
+  public ResponseEntity addOneRsEventDB(@RequestBody @Valid RsEventDB rsEventDB) throws JsonProcessingException {
+    Integer userID = Integer.valueOf(rsEventDB.getUserId());
+    if(userRepository.existsById(userID)){
+      RsEventEntity rsEventEntity = RsEventEntity.builder()
+              .eventName(rsEventDB.getEventName())
+              .keyWord(rsEventDB.getKeyWord())
+              .userId(rsEventDB.getUserId())
+              .build();
+      rsEventRepository.save(rsEventEntity);
+      return ResponseEntity.created(null).build();
+    }else{
+      return ResponseEntity.badRequest().build();
+    }
   }
 
   @PutMapping("/rs/{index}")

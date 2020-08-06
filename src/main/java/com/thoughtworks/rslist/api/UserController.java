@@ -19,9 +19,7 @@ import java.util.List;
 public class UserController {
     public static List<User> users = new ArrayList<>();
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+
 
     public static void addUser(User user){
         if(!users.contains(user)){
@@ -29,6 +27,9 @@ public class UserController {
         }
     }
 
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
     private final UserRepository userRepository;
 
     @GetMapping("/user/list")

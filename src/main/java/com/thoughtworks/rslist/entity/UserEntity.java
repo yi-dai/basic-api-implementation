@@ -20,7 +20,7 @@ import javax.persistence.Table;
 public class UserEntity {
     @Id
     @GeneratedValue
-    private Integer id;
+    private Integer ID;
     private String name;
     private String gender;
     private int age;
