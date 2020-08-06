@@ -57,9 +57,6 @@ public class UserController {
         return ResponseEntity.ok(null);
     }
 
-
-
-
     @PostMapping("/user")
     public ResponseEntity userRegister(@RequestBody @Valid User user){
         Integer indexNew = null;
