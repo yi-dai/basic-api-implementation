@@ -49,6 +49,14 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/db/user/{id}")
+    public ResponseEntity deleteUsersFromDB(@PathVariable Integer id){
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+        }
+        return ResponseEntity.ok(null);
+    }
+
 
 
 
