@@ -14,9 +14,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -47,25 +49,21 @@ class RsListApplicationTests {
     }
 
     @Test
-    void shouldAddUser1() throws Exception {
+    void shouldGetUser() throws Exception {
         User user = new User("Tom","male",19,"a@b.c","12345678910");
         String userString = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/db/user").content(userString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
-
-        User user1 = new User("Bob","male",20,"a@b.c","12345678910");
-        String userString1 = objectMapper.writeValueAsString(user1);
-        mockMvc.perform(post("/db/user").content(userString1).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
         List<UserEntity> userList = userRepository.findAll();
-        assertEquals(2,userList.size());
-        assertEquals("Bob", userList.get(1).getName());
-        assertEquals("male", userList.get(1).getGender());
+        UserEntity userEntity = userList.get(0);
+        Integer id = userEntity.getId();
+
+        mockMvc.perform(get("/db/user/"+id))
+                .andExpect(jsonPath("$.name", is("Tom")))
+                .andExpect(status().isOk());
     }
 
-    @Test
-    void contextLoads() {
-    }
+
 
 
 

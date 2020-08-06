@@ -11,8 +11,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -36,7 +38,20 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    
+
+    @GetMapping("/db/user/{id}")
+    public ResponseEntity<UserEntity> getUsersFromDB(@PathVariable Integer id){
+        if(!userRepository.existsById(id)){
+            return ResponseEntity.ok(null);
+        }else{
+            UserEntity userEntity = userRepository.findById(id).get();
+            return ResponseEntity.ok(userEntity);
+        }
+    }
+
+
+
+
     @PostMapping("/user")
     public ResponseEntity userRegister(@RequestBody @Valid User user){
         Integer indexNew = null;
