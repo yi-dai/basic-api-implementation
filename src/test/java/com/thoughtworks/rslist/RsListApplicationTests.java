@@ -105,4 +105,34 @@ class RsListApplicationTests {
         assertEquals("股票", rsEventList.get(0).getEventName());
         assertEquals("经济", rsEventList.get(0).getKeyWord());
     }
+
+    @Test
+    void shouldDeleteAllRsEventWhenDeleteUser() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("Tom")
+                .gender("male")
+                .age(19)
+                .email("a@b.c")
+                .phone("12345678910")
+                .build();
+        userEntity = userRepository.save(userEntity);
+        Integer intUserID = userEntity.getID();
+        String userID = String.valueOf(intUserID);
+        RsEventDB rsEventDB = new RsEventDB("股票", "经济", userID);
+        String ursEventDBString = objectMapper.writeValueAsString(rsEventDB);
+        mockMvc.perform(post("/db/rs/event").content(ursEventDBString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        RsEventDB rsEventDB1 = new RsEventDB("期货", "经济", userID);
+        String ursEventDBString1 = objectMapper.writeValueAsString(rsEventDB);
+        mockMvc.perform(post("/db/rs/event").content(ursEventDBString1).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        mockMvc.perform(delete("/db/user/" + intUserID))
+                .andExpect(status().isOk());
+        List<UserEntity> userListNew = userRepository.findAll();
+        assertEquals(0,userListNew.size());
+        List<RsEventEntity> rsEventList = rsEventRepository.findAll();
+        assertEquals(0,rsEventList.size());
+
+
+    }
 }
