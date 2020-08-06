@@ -5,10 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 
 @Data
@@ -20,12 +18,14 @@ import javax.persistence.Table;
 public class UserEntity {
     @Id
     @GeneratedValue
-    private Integer ID;
+    private Integer id;
     private String name;
     private String gender;
     private int age;
     private String email;
     private String phone;
-    private int vote;
+    private int voteNumLeft;
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "userId")
+    private List<RsEventEntity> events;
 
 }

@@ -5,8 +5,9 @@ import com.thoughtworks.rslist.domain.RsEventDB;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.entity.RsEventEntity;
 import com.thoughtworks.rslist.entity.UserEntity;
-import com.thoughtworks.rslist.resposiry.RsEventRepository;
-import com.thoughtworks.rslist.resposiry.UserRepository;
+import com.thoughtworks.rslist.respository.RsEventRepository;
+import com.thoughtworks.rslist.respository.UserRepository;
+import com.thoughtworks.rslist.respository.VoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +35,8 @@ class RsListApplicationTests {
     UserRepository userRepository;
     @Autowired
     RsEventRepository rsEventRepository;
+    @Autowired
+    VoteRepository voteRepository;
 
     @BeforeEach
     void setup(){
@@ -62,7 +65,7 @@ class RsListApplicationTests {
                 .phone("12345678910")
                 .build();
         userEntity = userRepository.save(userEntity);
-        Integer id = userEntity.getID();
+        Integer id = userEntity.getId();
         mockMvc.perform(get("/db/user/"+id))
                 .andExpect(jsonPath("$.name", is("Tom")))
                 .andExpect(status().isOk());
@@ -78,7 +81,7 @@ class RsListApplicationTests {
                 .phone("12345678910")
                 .build();
         userEntity = userRepository.save(userEntity);
-        Integer id = userEntity.getID();
+        Integer id = userEntity.getId();
         mockMvc.perform(delete("/db/user/"+id))
                 .andExpect(status().isOk());
         List<UserEntity> userListNew = userRepository.findAll();
@@ -95,7 +98,7 @@ class RsListApplicationTests {
                 .phone("12345678910")
                 .build();
         userEntity = userRepository.save(userEntity);
-        String userID = String.valueOf(userEntity.getID());
+        String userID = String.valueOf(userEntity.getId());
         RsEventDB rsEventDB = new RsEventDB("股票", "经济", userID);
         String ursEventDBString = objectMapper.writeValueAsString(rsEventDB);
         mockMvc.perform(post("/db/rs/event").content(ursEventDBString).contentType(MediaType.APPLICATION_JSON))
@@ -116,7 +119,7 @@ class RsListApplicationTests {
                 .phone("12345678910")
                 .build();
         userEntity = userRepository.save(userEntity);
-        Integer intUserID = userEntity.getID();
+        Integer intUserID = userEntity.getId();
         String userID = String.valueOf(intUserID);
         RsEventDB rsEventDB = new RsEventDB("股票", "经济", userID);
         String ursEventDBString = objectMapper.writeValueAsString(rsEventDB);
@@ -144,14 +147,14 @@ class RsListApplicationTests {
                 .phone("12345678910")
                 .build();
         userEntity = userRepository.save(userEntity);
-        String userID = String.valueOf(userEntity.getID());
+        String userID = String.valueOf(userEntity.getId());
         RsEventEntity rsEventEntity = RsEventEntity.builder()
                 .eventName("股票")
                 .keyWord("经济")
                 .userId(userID)
                 .build();
         rsEventEntity = rsEventRepository.save(rsEventEntity);
-        int rsEventID = rsEventEntity.getID();
+        int rsEventID = rsEventEntity.getId();
         RsEventEntity newRsEventEntity = RsEventEntity.builder()
                 .eventName("期货")
                 .keyWord("经济")
@@ -174,15 +177,15 @@ class RsListApplicationTests {
                 .phone("12345678910")
                 .build();
         userEntity = userRepository.save(userEntity);
-        String userID = String.valueOf(userEntity.getID());
+        String userID = String.valueOf(userEntity.getId());
         RsEventEntity rsEventEntity = RsEventEntity.builder()
                 .eventName("股票")
                 .keyWord("经济")
                 .userId(userID)
                 .build();
         rsEventEntity = rsEventRepository.save(rsEventEntity);
-        int rsEventID = rsEventEntity.getID();
-        String newUserID = String.valueOf(userEntity.getID() + 1);
+        int rsEventID = rsEventEntity.getId();
+        String newUserID = String.valueOf(userEntity.getId() + 1);
         RsEventEntity newRsEventEntity = RsEventEntity.builder()
                 .eventName("期货")
                 .keyWord("经济")
@@ -203,14 +206,14 @@ class RsListApplicationTests {
                 .phone("12345678910")
                 .build();
         userEntity = userRepository.save(userEntity);
-        String userID = String.valueOf(userEntity.getID());
+        String userID = String.valueOf(userEntity.getId());
         RsEventEntity rsEventEntity = RsEventEntity.builder()
                 .eventName("股票")
                 .keyWord("经济")
                 .userId(userID)
                 .build();
         rsEventEntity = rsEventRepository.save(rsEventEntity);
-        int rsEventID = rsEventEntity.getID();
+        int rsEventID = rsEventEntity.getId();
         RsEventEntity newRsEventEntity = RsEventEntity.builder()
                 .eventName(null)
                 .keyWord("经济")
@@ -233,14 +236,14 @@ class RsListApplicationTests {
                 .phone("12345678910")
                 .build();
         userEntity = userRepository.save(userEntity);
-        String userID = String.valueOf(userEntity.getID());
+        String userID = String.valueOf(userEntity.getId());
         RsEventEntity rsEventEntity = RsEventEntity.builder()
                 .eventName("股票")
                 .keyWord("经济")
                 .userId(userID)
                 .build();
         rsEventEntity = rsEventRepository.save(rsEventEntity);
-        int rsEventID = rsEventEntity.getID();
+        int rsEventID = rsEventEntity.getId();
         RsEventEntity newRsEventEntity = RsEventEntity.builder()
                 .eventName(null)
                 .keyWord("经济")
@@ -252,4 +255,5 @@ class RsListApplicationTests {
         List<RsEventEntity> rsEventList = rsEventRepository.findAll();
         assertEquals("股票", rsEventList.get(0).getEventName());
     }
+
 }

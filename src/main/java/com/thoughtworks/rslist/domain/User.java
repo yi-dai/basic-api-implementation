@@ -23,7 +23,7 @@ public class User {
     private String email;
     @Pattern(regexp = "1\\d{10}")
     private String phone;
-    private int vote = 10;
+    private int voteNumLeft = 10;
 
 
     public User(String name, String gender, int age, String email, String phone) {

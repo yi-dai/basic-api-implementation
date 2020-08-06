@@ -4,7 +4,7 @@ package com.thoughtworks.rslist.api;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.entity.UserEntity;
 import com.thoughtworks.rslist.exception.CommonError;
-import com.thoughtworks.rslist.resposiry.UserRepository;
+import com.thoughtworks.rslist.respository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -81,7 +81,7 @@ public class UserController {
                 .age(user.getAge())
                 .email(user.getEmail())
                 .phone(user.getPhone())
-                .vote((user.getVote()))
+                .voteNumLeft((user.getVoteNumLeft()))
                 .build();
         userRepository.save(userEntity);
 

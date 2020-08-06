@@ -1,4 +1,4 @@
-package com.thoughtworks.rslist.resposiry;
+package com.thoughtworks.rslist.respository;
 
 import com.thoughtworks.rslist.entity.RsEventEntity;
 import org.springframework.data.repository.CrudRepository;
