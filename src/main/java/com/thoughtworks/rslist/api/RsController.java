@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +86,28 @@ public class RsController {
     }else{
       return ResponseEntity.badRequest().build();
     }
+  }
+
+  @PatchMapping("/db/rs/{rsEventID}")
+  public ResponseEntity updateRsEventDB(@PathVariable Integer rsEventID, @RequestBody RsEventDB rsEventDB){
+    if(rsEventRepository.existsById(rsEventID)){
+      RsEventEntity rsEventEntity = rsEventRepository.findById(rsEventID).get();
+      String userIDOfRsEventEntity = rsEventEntity.getUserId();
+      String userID = rsEventDB.getUserId();
+      if(userIDOfRsEventEntity.equals(userID)){
+        if(rsEventDB.getEventName() != null){
+          rsEventEntity.setEventName(rsEventDB.getEventName());
+        }
+        if(rsEventDB.getKeyWord() != null){
+          rsEventEntity.setKeyWord(rsEventDB.getKeyWord());
+        }
+
+        rsEventRepository.save(rsEventEntity);
+
+        return ResponseEntity.created(null).build();
+      }
+    }
+    return ResponseEntity.badRequest().build();
   }
 
   @PutMapping("/rs/{index}")

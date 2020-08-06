@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.entity;
 
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class RsEventEntity {
     private String eventName;
     private String keyWord;
     @Column(name = "user_id")
+    @NotNull
     private String userId;
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)

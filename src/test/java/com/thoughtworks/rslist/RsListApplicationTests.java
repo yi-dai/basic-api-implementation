@@ -1,7 +1,6 @@
 package com.thoughtworks.rslist;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.RsEventDB;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.entity.RsEventEntity;
@@ -16,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.persistence.Table;
 import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -132,7 +132,124 @@ class RsListApplicationTests {
         assertEquals(0,userListNew.size());
         List<RsEventEntity> rsEventList = rsEventRepository.findAll();
         assertEquals(0,rsEventList.size());
+    }
 
+    @Test
+    void shouldUpdateRsEvent() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("Tom")
+                .gender("male")
+                .age(19)
+                .email("a@b.c")
+                .phone("12345678910")
+                .build();
+        userEntity = userRepository.save(userEntity);
+        String userID = String.valueOf(userEntity.getID());
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("股票")
+                .keyWord("经济")
+                .userId(userID)
+                .build();
+        rsEventEntity = rsEventRepository.save(rsEventEntity);
+        int rsEventID = rsEventEntity.getID();
+        RsEventEntity newRsEventEntity = RsEventEntity.builder()
+                .eventName("期货")
+                .keyWord("经济")
+                .userId(userID)
+                .build();
+        String rsEventEntityString = objectMapper.writeValueAsString(newRsEventEntity);
+        mockMvc.perform(patch("/db/rs/"+rsEventID).content(rsEventEntityString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        List<RsEventEntity> rsEventList = rsEventRepository.findAll();
+        assertEquals("期货", rsEventList.get(0).getEventName());
+    }
 
+    @Test
+    void shouldUpdateRsEventWithDifferentUser() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("Tom")
+                .gender("male")
+                .age(19)
+                .email("a@b.c")
+                .phone("12345678910")
+                .build();
+        userEntity = userRepository.save(userEntity);
+        String userID = String.valueOf(userEntity.getID());
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("股票")
+                .keyWord("经济")
+                .userId(userID)
+                .build();
+        rsEventEntity = rsEventRepository.save(rsEventEntity);
+        int rsEventID = rsEventEntity.getID();
+        String newUserID = String.valueOf(userEntity.getID() + 1);
+        RsEventEntity newRsEventEntity = RsEventEntity.builder()
+                .eventName("期货")
+                .keyWord("经济")
+                .userId(newUserID)
+                .build();
+        String rsEventEntityString = objectMapper.writeValueAsString(newRsEventEntity);
+        mockMvc.perform(patch("/db/rs/"+rsEventID).content(rsEventEntityString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldUpdateRsEventWithoutEventName() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("Tom")
+                .gender("male")
+                .age(19)
+                .email("a@b.c")
+                .phone("12345678910")
+                .build();
+        userEntity = userRepository.save(userEntity);
+        String userID = String.valueOf(userEntity.getID());
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("股票")
+                .keyWord("经济")
+                .userId(userID)
+                .build();
+        rsEventEntity = rsEventRepository.save(rsEventEntity);
+        int rsEventID = rsEventEntity.getID();
+        RsEventEntity newRsEventEntity = RsEventEntity.builder()
+                .eventName(null)
+                .keyWord("经济")
+                .userId(userID)
+                .build();
+        String rsEventEntityString = objectMapper.writeValueAsString(newRsEventEntity);
+        mockMvc.perform(patch("/db/rs/"+rsEventID).content(rsEventEntityString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        List<RsEventEntity> rsEventList = rsEventRepository.findAll();
+        assertEquals("股票", rsEventList.get(0).getEventName());
+    }
+
+    @Test
+    void shouldUpdateRsEventWithoutUser() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("Tom")
+                .gender("male")
+                .age(19)
+                .email("a@b.c")
+                .phone("12345678910")
+                .build();
+        userEntity = userRepository.save(userEntity);
+        String userID = String.valueOf(userEntity.getID());
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("股票")
+                .keyWord("经济")
+                .userId(userID)
+                .build();
+        rsEventEntity = rsEventRepository.save(rsEventEntity);
+        int rsEventID = rsEventEntity.getID();
+        RsEventEntity newRsEventEntity = RsEventEntity.builder()
+                .eventName(null)
+                .keyWord("经济")
+                .userId(null)
+                .build();
+        String rsEventEntityString = objectMapper.writeValueAsString(newRsEventEntity);
+        mockMvc.perform(patch("/db/rs/"+rsEventID).content(rsEventEntityString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        List<RsEventEntity> rsEventList = rsEventRepository.findAll();
+        assertEquals("股票", rsEventList.get(0).getEventName());
     }
 }
