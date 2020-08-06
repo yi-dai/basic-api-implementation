@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.entity.UserEntity;
 import com.thoughtworks.rslist.resposiry.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +49,15 @@ class RsListApplicationTests {
     @Test
     void shouldGetUserWhenGivenId() throws Exception {
         User user = new User("Tom","male",19,"a@b.c","12345678910");
-        String userString = objectMapper.writeValueAsString(user);
-        mockMvc.perform(post("/db/user").content(userString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-        List<UserEntity> userList = userRepository.findAll();
-        UserEntity userEntity = userList.get(0);
-        Integer id = userEntity.getId();
-
+        UserEntity userEntity = UserEntity.builder()
+                .name(user.getName())
+                .gender(user.getGender())
+                .age(user.getAge())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .build();
+        UserEntity newUserEntity = userRepository.save(userEntity);
+        Integer id = newUserEntity.getId();
         mockMvc.perform(get("/db/user/"+id))
                 .andExpect(jsonPath("$.name", is("Tom")))
                 .andExpect(status().isOk());
@@ -64,22 +65,21 @@ class RsListApplicationTests {
 
     @Test
     void shouldDeleteUserWhenGivenId() throws Exception {
+
         User user = new User("Tom","male",19,"a@b.c","12345678910");
-        String userString = objectMapper.writeValueAsString(user);
-        mockMvc.perform(post("/db/user").content(userString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-        List<UserEntity> userList = userRepository.findAll();
-        UserEntity userEntity = userList.get(0);
-        Integer id = userEntity.getId();
+        UserEntity userEntity = UserEntity.builder()
+                .name(user.getName())
+                .gender(user.getGender())
+                .age(user.getAge())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .build();
+        UserEntity newUserEntity = userRepository.save(userEntity);
+        Integer id = newUserEntity.getId();
         mockMvc.perform(delete("/db/user/"+id))
                 .andExpect(status().isOk());
         List<UserEntity> userListNew = userRepository.findAll();
         assertEquals(0,userListNew.size());
 
     }
-
-
-
-
-
 }
