@@ -52,7 +52,7 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity addOneRsEvent(@RequestBody @Valid RsEvent rsEvent1) throws MethodArgumentNotValidException {
+  public ResponseEntity addOneRsEvent(@RequestBody @Valid RsEvent rsEvent1) throws JsonProcessingException {
     User user = rsEvent1.getUser();
     rsList.add(rsEvent1);
     UserController.addUser(user);
@@ -61,33 +61,17 @@ public class RsController {
     return ResponseEntity.created(null).header("index", headValue).build();
   }
 
-  @PostMapping("/rs/{index}")
-  public ResponseEntity updateOneRsEvent(@PathVariable int index, @RequestBody String rsEventString) throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    RsEvent rsEvent = objectMapper.readValue(rsEventString,RsEvent.class);
+  @PutMapping("/rs/{index}")
+  public ResponseEntity updateOneRsEvent(@PathVariable int index, @RequestBody @Valid RsEvent rsEvent) throws JsonProcessingException {
     RsEvent rsEventNeedBeUpdated = rsList.get(index - 1);
-    String keyWord = rsEvent.getKeyWord();
-    String eventName = rsEvent.getEventName();
+    if (!rsEventNeedBeUpdated.getEventName().equals(rsEvent.getEventName())){
+      rsEventNeedBeUpdated.setEventName(rsEvent.getEventName());
+    }
+    if (!rsEventNeedBeUpdated.getKeyWord().equals(rsEvent.getKeyWord())){
+      rsEventNeedBeUpdated.setKeyWord(rsEvent.getKeyWord());
+    }
     Integer indexInteger = index;
     String headValue = indexInteger.toString();
-    if (keyWord == null){
-      if (!rsEventNeedBeUpdated.getEventName().equals(rsEvent.getEventName())){
-        rsEventNeedBeUpdated.setEventName(rsEvent.getEventName().toString());
-      }
-      return ResponseEntity.created(null).header("index", headValue).build();
-    } else if (eventName == null){
-      if (!rsEventNeedBeUpdated.getKeyWord().equals(rsEvent.getKeyWord())){
-        rsEventNeedBeUpdated.setKeyWord(rsEvent.getKeyWord().toString());
-      }
-      return ResponseEntity.created(null).header("index", headValue).build();
-    } else {
-      if (!rsEventNeedBeUpdated.getEventName().equals(rsEvent.getEventName())){
-        rsEventNeedBeUpdated.setEventName(rsEvent.getEventName().toString());
-      }
-      if (!rsEventNeedBeUpdated.getKeyWord().equals(rsEvent.getKeyWord())){
-        rsEventNeedBeUpdated.setKeyWord(rsEvent.getKeyWord().toString());
-      }
-    }
     return ResponseEntity.created(null).header("index", headValue).build();
   }
 

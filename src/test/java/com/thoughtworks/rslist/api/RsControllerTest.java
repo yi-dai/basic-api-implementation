@@ -53,11 +53,9 @@ public class RsControllerTest {
     @Test
     @Order(3)
     void shouldGetRSEventBetween() throws Exception {
-        mockMvc.perform(get("/rs/list?start=1&end=2"))
+        mockMvc.perform(get("/rs/list?end=1"))
                 .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("一类")))
-                .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
-                .andExpect(jsonPath("$[1].keyWord",is("二类")))
                 .andExpect(status().isOk());
     }
 
@@ -81,14 +79,15 @@ public class RsControllerTest {
     @Test
     @Order(5)
     void shouldUpdateOneRsEvent() throws Exception {
-        RsEvent rsEvent = new RsEvent(null, "未分类",null);
+        User user = new User("Nlibaba", "female",19,"a@c.v", "11234567890");
+        RsEvent rsEvent = new RsEvent("第四条事件", "未分类",user);
         ObjectMapper objectMapper = new ObjectMapper();
         String rsEventJson = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(post("/rs/1").content(rsEventJson).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(put("/rs/1").content(rsEventJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().exists("index"))
                 .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
+                .andExpect(jsonPath("$[0].eventName",is("第四条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("未分类")))
                 .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord",is("二类")))
@@ -222,6 +221,17 @@ public class RsControllerTest {
     void outOfIndexRsEvent() throws Exception {
         mockMvc.perform(get("/rs/10"))
                 .andExpect(jsonPath("$.errorMessage", is("invalid index")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(16)
+    void shouldUpdateOneRsEventWithoutEventName() throws Exception {
+        RsEvent rsEvent = new RsEvent(null, "未分类",null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String rsEventJson = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(put("/rs/1").content(rsEventJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorMessage", is("invalid param")))
                 .andExpect(status().isBadRequest());
     }
 
