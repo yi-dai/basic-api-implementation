@@ -29,11 +29,12 @@ public class VoteEntity {
     @NotNull
     private String userId;
 
+
+    @NotNull
+    private String rsEventID;
     @ManyToOne
     @JoinColumn(name = "rs_event_id")
     private RsEventEntity rsEventEntity;
-    @Column(name = "rs_event_id")
-    @NotNull
-    private String rsEventID;
+
 
 }

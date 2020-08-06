@@ -5,6 +5,7 @@ import com.thoughtworks.rslist.domain.RsEventDB;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.entity.RsEventEntity;
 import com.thoughtworks.rslist.entity.UserEntity;
+import com.thoughtworks.rslist.entity.VoteEntity;
 import com.thoughtworks.rslist.respository.RsEventRepository;
 import com.thoughtworks.rslist.respository.UserRepository;
 import com.thoughtworks.rslist.respository.VoteRepository;
@@ -254,6 +255,40 @@ class RsListApplicationTests {
                 .andExpect(status().isBadRequest());
         List<RsEventEntity> rsEventList = rsEventRepository.findAll();
         assertEquals("股票", rsEventList.get(0).getEventName());
+    }
+
+    @Test
+    void shouldVoteToOneRsEvent() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("Tom")
+                .gender("male")
+                .age(19)
+                .email("a@b.c")
+                .phone("12345678910")
+                .build();
+        userEntity = userRepository.save(userEntity);
+        String userID = String.valueOf(userEntity.getId());
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("股票")
+                .keyWord("经济")
+                .userId(userID)
+                .build();
+        rsEventEntity = rsEventRepository.save(rsEventEntity);
+        int rsEventID = rsEventEntity.getId();
+        VoteEntity voteEntity = VoteEntity.builder()
+                .voteNum(4)
+                .userId(userID)
+                .localDateTime(LocalDateTime.now())
+                .build();
+        String voteEntityString = objectMapper.writeValueAsString(voteEntity);
+        mockMvc.perform(post("/rs/vote/{rsEventID}"+String.valueOf(rsEventID)).content(voteEntityString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        List<VoteEntity> voteList = voteRepository.findAll();
+        List<RsEventEntity> rsEventList = rsEventRepository.findAll();
+        List<UserEntity> userList = userRepository.findAll();
+        assertEquals(4,voteList.get(0).getVoteNum());
+        assertEquals(6,userList.get(0).getVoteNumLeft());
+        assertEquals(4,rsEventList.get(0).getVoteNum());
     }
 
 }
