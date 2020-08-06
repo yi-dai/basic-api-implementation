@@ -268,21 +268,26 @@ class RsListApplicationTests {
                 .build();
         userEntity = userRepository.save(userEntity);
         String userID = String.valueOf(userEntity.getId());
+
         RsEventEntity rsEventEntity = RsEventEntity.builder()
                 .eventName("股票")
                 .keyWord("经济")
                 .userId(userID)
                 .build();
         rsEventEntity = rsEventRepository.save(rsEventEntity);
-        int rsEventID = rsEventEntity.getId();
+        //String rsEventID = String.valueOf(rsEventEntity.getId());
+        int rsID = rsEventEntity.getId();
+
         VoteEntity voteEntity = VoteEntity.builder()
                 .voteNum(4)
                 .userId(userID)
                 .localDateTime(LocalDateTime.now())
+                .rsID(String.valueOf(rsID))
                 .build();
         String voteEntityString = objectMapper.writeValueAsString(voteEntity);
-        mockMvc.perform(post("/rs/vote/{rsEventID}"+String.valueOf(rsEventID)).content(voteEntityString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/vote").content(voteEntityString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
         List<VoteEntity> voteList = voteRepository.findAll();
         List<RsEventEntity> rsEventList = rsEventRepository.findAll();
         List<UserEntity> userList = userRepository.findAll();

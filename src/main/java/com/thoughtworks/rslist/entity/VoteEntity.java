@@ -31,7 +31,7 @@ public class VoteEntity {
 
 
     @NotNull
-    private String rsEventID;
+    private String rsID;
     @ManyToOne
     @JoinColumn(name = "rs_event_id")
     private RsEventEntity rsEventEntity;

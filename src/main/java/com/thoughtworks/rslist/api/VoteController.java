@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public class VoteController {
     private final VoteRepository voteRepository;
@@ -22,17 +23,18 @@ public class VoteController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/rs/vote/{rsEventID}")
-    public ResponseEntity voteForOneEvent(@PathVariable String rsEventID, @RequestBody VoteEntity voteEntity){
+    @PostMapping("/vote")
+    public ResponseEntity voteForOneEvent(@RequestBody VoteEntity voteEntity){
         int userID = Integer.valueOf(voteEntity.getUserId());
-        int rsEventIDInt = Integer.valueOf(rsEventID);
+        String rsID = voteEntity.getRsID();
+        int rsEventIDInt = Integer.valueOf(rsID);
         if(rsEventRepository.existsById(rsEventIDInt) && userRepository.existsById(userID)){
             RsEventEntity rsEventEntity = rsEventRepository.findById(rsEventIDInt).get();
             UserEntity userEntity = userRepository.findById(userID).get();
             int userVoteLeft = userEntity.getVoteNumLeft();
             int voteNum = voteEntity.getVoteNum();
             if(userVoteLeft >= voteNum){
-                voteEntity.setRsEventID(rsEventID);
+                voteEntity.setRsID(rsID);
                 userEntity.setVoteNumLeft(userVoteLeft - voteNum);
                 rsEventEntity.setVoteNum(voteNum);
                 rsEventRepository.save(rsEventEntity);
@@ -48,5 +50,7 @@ public class VoteController {
 
         }
         return ResponseEntity.ok(null);
+
+
     }
 }
